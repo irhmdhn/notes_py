@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Notes</title>
+    <link rel="stylesheet" href="{% static "css/style.css" %}"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="{% static "js/tailwind.js" %}"></script>
+
+  </head>
+
+  <body class="bg-purple-50 text-purple-950">
+    <main class="w-screen px-6 md:pe-12 md:ps-0">
+      <div class="flex gap-6 md:gap-12">
+
+        <aside class="bg-purple-300 max-w-96 md:w-96 h-screen px-6 py-20 absolute z-10 right-0 translate-x-96 md:translate-x-0 md:static transition-transform">
+          <div class="flex flex-col gap-6">
+            <h3 class="text-xl">DAFTAR CATATAN</h3>
+            <div class="grid grid-cols-1 gap-3">
+              {%if notes%}
+                {% for note in notes %}
+                  <a href="{% url 'index' %}?noteid={{ note.id }}" class="bg-purple-50 flex flex-col p-3 rounded text-lg shadow" aria-current="true">
+                    <span class="line-clamp-1 leading-10">{{ note.title }}</span>
+                    <span class="text-xs text-end text-purple-500">{{ note.modified_at|date:"m/d Y" }}</span>
+                  </a>
+                {% endfor %}
+
+              {% else %}
+                  <span class="text-center text-secondary">Catatan kosong</span>
+              {% endif %}
+
+            </div>
+
+            <div class="text-center h-fit">
+              <a href="{% url 'index' %}" class="bg-purple-700 rounded-xl w-fit py-3 px-6 text-purple-50 shadow-lg shadow-purple-400">Tambah</a>            
+            </div>
+
+          </div>
+        </aside>
+
+        <div class="col-7 w-full">
+          <button id="btn-list" class="absolute right-6 top-6 z-50 bg-purple-700 rounded-xl w-fit p-3 text-purple-50 shadow-lg shadow-purple-400 ph ph-list md:invisible"></button>
+          <div class="py-6 text-center">
+            <a href="{% url 'index' %}" class="font-bold text-2xl">My Notes</a>
+          </div>
+          <form method="post" action="{% url 'index' %}" class="flex flex-col gap-6">
+            {% csrf_token %}
+
+            <input type="hidden" name="noteid" value="{{ noteid }}" />
+            <h3 class="text-xl">{{ note|yesno:"DETAIL CATATAN,TAMBAH CATATAN"}}</h3>
+              <input id="input-title" type="text" class="bg-white px-3 py-2 rounded border" name="title" placeholder="Judul Catatan" required
+                {% if note %}
+                  value="{{ note.title }}"
+                {% endif %}
+              />
+              <textarea id="input-content" class="border" name="content" placeholder="Content" rows="3">
+                  {% if note %}
+                    {{ note.content }}
+                  {% endif %}
+              </textarea>
+
+            <div class="field is-grouped d-flex gap-3 flex justify-end">
+              {% if note %}
+                <a href="{% url 'delete_note' note.id %}" class="border border-red-700 rounded-xl w-fit py-2 px-6 text-red-700">Hapus</a>
+              {% endif %}
+                <button class="bg-blue-700 rounded-xl w-fit py-2 px-6 text-blue-50">Simpan</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.ckeditor.com/ckeditor5/40.2.0/classic/ckeditor.js"></script>
+    <script src="{% static "js/main.js" %}"></script>
+  </body>
+</html>
